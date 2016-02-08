@@ -1,0 +1,13 @@
+{
+  "name": "Jest_MVP",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start"
+  },
+  "dependencies": {
+    "assert": "^1.3.0",
+    "react-native": "^0.18.1",
+    "underscore": "^1.8.3"
+  }
+}
