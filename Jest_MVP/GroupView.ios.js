@@ -23,27 +23,56 @@ import React, {
   Dimensions,
 } from 'react-native';
 
-var serverURL = 'http://127.0.0.1:8082/';
+var FireBase = require('firebase');
+var messagesRef = new FireBase('https://intense-inferno-4907.firebaseio.com/messages');
 var windowWidth = Dimensions.get('window').width;
 
-class GroupView extends Component {
+// Load the messages with sample data
+messagesRef.set({});
+messagesRef.push({
+  speaker: 'Matt',
+  message: 'sample',
+});
+messagesRef.push(
+  {
+    speaker: 'Yuan',
+    message: 'sample',
+  });
+messagesRef.push({
+  speaker: 'Joe',
+  message: 'sample',
+});
 
-  constructor(props) {
-    super(props);
-    this.renderRow = this.renderRow.bind(this);
-    this.submitMsg = this.submitMsg.bind(this);
-    this.seeEvents = this.seeEvents.bind(this);
-    this.state = {
+var GroupView = React.createClass({
+
+  getInitialState: function() {
+    return {
       dataSource: new ListView.DataSource({
-        rowHasChanged: () => true,
+        rowHasChanged: (row1, row2) => row1 !== row2,
       }),
-    };
-  }
-  componentDidMount() {
-    this.getMessages();
-  }
+    }
+  },
+  componentDidMount: function() {
+    // this.renderRow = this.renderRow.bind(this);
+    // this.submitMsg = this.submitMsg.bind(this);
+    // this.seeEvents = this.seeEvents.bind(this);
 
-  render() {
+    var chat = this;
+    // Load new messages whenever the messages change
+    messagesRef.on('value', function(snapshot) {
+      var messages = snapshot.val();
+      chat.setState({
+        dataSource: chat.state.dataSource.cloneWithRows(messages),
+      });
+    });
+  }
+  ,
+  componentWillUnmount: function() {
+    // TODO unregister .on(value) to prevent modifying the state of an unmounted
+    // component
+  }
+  ,
+  render: function() {
 
     return (
       <View style={styles.container}>
@@ -65,62 +94,32 @@ class GroupView extends Component {
       </View>
     );
   }
-
-  renderRow(msg) {
+  ,
+  renderRow: function(msg) {
     return(<Message message={msg} />);
   }
-
-  getMessages() {
-
-    // Get the messages from the server
-    fetch(serverURL + 'getmessages')
-      .then(response => response.json())
-      .then(json => {
-        console.log(JSON.stringify(json));
-        this.setState({
-          dataSource: this.state.dataSource.cloneWithRows(json),
-        });
-      })
-      .catch(error => console.log('getMessages failed'));
-  }
-
-  submitMsg(evt) {
+  ,
+  submitMsg: function (evt) {
     var newMsg = {
       speaker: 'Matthew',
       message: evt.nativeEvent.text,
     }
 
-    fetch(serverURL + 'addmsg', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        msg: newMsg,
-      })
-    });
-    //  .then(response => console.log())
-    // .then(json => {
-    //   console.log(JSON.stringify(json));
-    //   this.setState({
-    //     dataSource: this.state.dataSource.cloneWithRows(json),
-    //   });
-    // })
-    // .catch(error => console.log('getMessages failed'));
+    // Add the new message to the firebase
+    messagesRef.push(newMsg);
 
     // Clear the input text
     this._textInput.setNativeProps({text: ''});
   }
-
-  seeEvents() {
+  ,
+  seeEvents: function() {
     //this._eventsList.setState({visible: true});
     this.props.navigator.push({
       title: 'Events',
       component: require('./EventView'),
     });
-  }
-}
+  },
+});
 
 class Message extends Component {
   render() {

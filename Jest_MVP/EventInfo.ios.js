@@ -15,6 +15,9 @@ import React, {
 var _ = require('underscore');
 var windowWidth = Dimensions.get('window').width;
 
+var FireBase = require('firebase');
+var eventsRef = new FireBase('https://intense-inferno-4907.firebaseio.com/myEvents/');
+
 class EventInfo extends Component {
 
   constructor(props) {
@@ -37,7 +40,7 @@ class EventInfo extends Component {
           placeholder={
             this.state.event.what ? this.state.event.what : 'Enter where'
           }
-          onSubmitEditing={this.updateWhat.bind(this)}
+          onChangeText={this.updateWhat.bind(this)}
         />
         <Text style={styles.infoText}>{'Where?'}</Text>
         <TextInput
@@ -45,7 +48,7 @@ class EventInfo extends Component {
           placeholder={
             this.state.event.where ? this.state.event.where : 'Enter where'
           }
-          onSubmitEditing={this.updateWhere.bind(this)}
+          onChangeText={this.updateWhere.bind(this)}
         />
         <Text style={styles.infoText} >{'When?'}</Text>
         <TextInput
@@ -53,7 +56,7 @@ class EventInfo extends Component {
           placeholder={
             this.state.event.when ? this.state.event.when : 'Enter when'
           }
-          onSubmitEditing={this.updateWhen.bind(this)}
+          onChangeText={this.updateWhen.bind(this)}
         />
         <TouchableHighlight onPress={this.addEvent}>
           <View style={styles.addButton}>
@@ -65,20 +68,22 @@ class EventInfo extends Component {
   }
 
   addEvent() {
-    this.props.groupEvents.push(this.state.event);
+
+    // Add the event to the database
+    eventsRef.push(this.state.event);
     this.props.navigator.pop();
   }
 
-  updateWhat(touchEvt) {
-    this.state.event.what = touchEvt.nativeEvent.text;
+  updateWhat(text) {
+    this.state.event.what = text;
   }
 
-  updateWhere(touchEvt) {
-    this.state.event.where = touchEvt.nativeEvent.text;
+  updateWhere(text) {
+    this.state.event.where = text;
   }
 
-  updateWhen(touchEvt) {
-    this.state.event.when = touchEvt.nativeEvent.text;
+  updateWhen(text) {
+    this.state.event.when = text;
   }
 }
 

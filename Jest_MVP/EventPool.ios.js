@@ -10,7 +10,11 @@ import React, {
   TouchableHighlight,
 } from 'react-native';
 
-var mock_templates = [
+var FireBase = require('firebase');
+var suggestedRef = new FireBase('https://intense-inferno-4907.firebaseio.com/suggestedEvents');
+
+// Init to the suggested events to a sample list
+suggestedRef.set([
   {
     what: 'Make Your Own',
     where: '',
@@ -31,7 +35,7 @@ var mock_templates = [
     where: '',
     when: '9pm Friday'
   }
-];
+]);
 
 class EventPool extends Component {
 
@@ -49,8 +53,11 @@ class EventPool extends Component {
     };
   }
   componentDidMount() {
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(mock_templates),
+    var myComponent = this;
+    suggestedRef.on('value', function(snapshot) {
+      myComponent.setState({
+        dataSource: myComponent.state.dataSource.cloneWithRows(snapshot.val()),
+      });
     });
   }
 

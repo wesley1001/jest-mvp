@@ -11,7 +11,11 @@ import React, {
   Modal,
 } from 'react-native';
 
-var mock_evts = [
+var FireBase = require('firebase');
+var eventsRef = new FireBase('https://intense-inferno-4907.firebaseio.com/myEvents/');
+
+// Init the events to a sample list
+eventsRef.set([
   {
     what: 'Dinner',
     where: 'Chipotle',
@@ -27,7 +31,7 @@ var mock_evts = [
     where: 'theatre',
     when: '5pm',
   }
-];
+]);
 
 class EventList extends Component {
 
@@ -45,8 +49,12 @@ class EventList extends Component {
     };
   }
   componentDidMount() {
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(mock_evts),
+
+    var myComponent = this;
+    eventsRef.on('value', function(snapshot) {
+      myComponent.setState({
+        dataSource: myComponent.state.dataSource.cloneWithRows(snapshot.val()),
+      });
     });
   }
 

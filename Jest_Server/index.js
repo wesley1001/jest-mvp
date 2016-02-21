@@ -71,8 +71,8 @@ app.post('/addmsg', function(req, res) {
   var msg = req.body.msg;
   assert.notEqual(msg, null);
   chatMessages.unshift(msg);
-  if(chatMessages.size > 10) {
-    console.log('Number messages: ' + chatMessages.length);
+  console.log('Number of messages: ' + chatMessages.length);
+  if(chatMessages.length > 10) {
     chatMessages.pop();
   }
 });

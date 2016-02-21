@@ -13,8 +13,17 @@ import React, {
 } from 'react-native';
 
 var GroupsList = require('./GroupsList');
+var GroupView = require('./GroupView');
+var globalState = require('./GlobalState');
 
 class Jest_MVP extends Component {
+
+  componentDidMount() {
+  }
+
+  componentWillUnmount() {
+  }
+
   render() {
     console.log('render first');
     return (
